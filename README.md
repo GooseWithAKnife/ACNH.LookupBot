@@ -13,16 +13,17 @@ A small Discord bot for **Animal Crossing: New Horizons** item, recipe, and vill
 ## Setup
 
 1. Clone or copy this repository.
-2. Add **`deps/NHSE.Core.dll`** from your own [NHSE](https://github.com/kwsch/NHSE/) build or another compatible source. You must comply with NHSE’s license and terms when you distribute or use that assembly.
-3. Build the project:
+2. Build the project:
    - **Development:** `dotnet build` from the repository root.
    - **Release publish (Windows):** run `build.bat`. Output is written to the `publish/` folder.
+3. Setup your discord bot token with the instructions below.
 
 ## Discord application
 
-1. In the Discord Developer Portal, open your application, then **Bot**.
+1. In the Discord Developer Portal, create your application, then **Bot**.
 2. Under **Privileged Gateway Intents**, enable **Message Content Intent** so prefix commands work in servers.
 3. Invite the bot with the scopes and permissions you need for reading and sending messages in your channels.
+4. Reset and copy your Token into the `lookup_config.json` in the `BotToken` key.
 
 ## Configuration and first run
 
