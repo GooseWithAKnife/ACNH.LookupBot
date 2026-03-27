@@ -75,6 +75,10 @@ namespace ACNH.LookupBot {
         return;
       }
 
+      if (ShouldIgnoreChannelForCommands(message)) {
+        return;
+      }
+
       int argPos = 0;
       if (!message.HasStringPrefix(_config.Prefix, ref argPos)) {
         return;
@@ -119,10 +123,12 @@ namespace ACNH.LookupBot {
         return false;
       }
 
-      if (_config.AllowedChannelIds.Count > 0
-          && !_config.AllowedChannelIds.Contains(context.Channel.Id)) {
-        denyReason = "You can't use that command here.";
-        return false;
+      if (_config.AllowedChannelIds.Count > 0 && context.Channel is SocketGuildChannel) {
+        ulong channelId = GetGuildWhitelistChannelId(context.Channel);
+        if (!_config.AllowedChannelIds.Contains(channelId)) {
+          denyReason = "You can't use that command here.";
+          return false;
+        }
       }
 
       if (!string.IsNullOrWhiteSpace(_config.RequiredRoleName)) {
@@ -140,6 +146,38 @@ namespace ACNH.LookupBot {
 
       denyReason = string.Empty;
       return true;
+    }
+
+    /// <summary>
+    /// Guild channel to match against <see cref="LookupConfig.AllowedChannelIds"/> (parent for threads).
+    /// </summary>
+    private static ulong GetGuildWhitelistChannelId(ISocketMessageChannel channel) {
+      if (channel is SocketThreadChannel thread) {
+        return thread.ParentChannel.Id;
+      }
+
+      return channel.Id;
+    }
+
+    /// <summary>
+    /// When <see cref="LookupConfig.AllowedChannelIds"/> is set, ignore guild traffic outside that list
+    /// (no replies). DMs are always considered. Owner matches <see cref="IsAuthorized"/> bypass.
+    /// </summary>
+    private bool ShouldIgnoreChannelForCommands(SocketUserMessage message) {
+      if (message.Channel is not SocketGuildChannel) {
+        return false;
+      }
+
+      if (_config.AllowedChannelIds.Count == 0) {
+        return false;
+      }
+
+      if (message.Author.Id == _ownerUserId) {
+        return false;
+      }
+
+      ulong channelId = GetGuildWhitelistChannelId(message.Channel);
+      return !_config.AllowedChannelIds.Contains(channelId);
     }
 
     private static Task LogAsync(LogMessage message) {

@@ -26,7 +26,11 @@ namespace ACNH.LookupBot {
     /// <summary>When non-empty, only these users may use commands (owner always allowed).</summary>
     public List<ulong> AllowedUserIds { get; set; } = new();
 
-    /// <summary>When non-empty, commands are only accepted in these channels (owner always allowed).</summary>
+    /// <summary>
+    /// When non-empty, prefix commands run only in these guild channels and in DMs. Other guild channels
+    /// are ignored with no reply. When empty, guild channels are not restricted by channel. Owner always
+    /// bypasses the guild channel list.
+    /// </summary>
     public List<ulong> AllowedChannelIds { get; set; } = new();
 
     /// <summary>
